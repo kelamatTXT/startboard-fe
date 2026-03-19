@@ -340,3 +340,33 @@
     </div>
   </div>
 </div>
+
+<!-- Unstar Confirm Dialog -->
+<div class="modal-overlay" *ngIf="showUnstarConfirm" (click)="cancelUnstar()">
+  <div class="modal unstar-modal" (click)="$event.stopPropagation()">
+    <div class="modal-emoji">⚠️</div>
+    <h3>Xác nhận bỏ Star?</h3>
+
+    <div class="unstar-warning">
+      <div class="unstar-repo-name" *ngIf="pendingUnstarRepo">
+        📦 <strong>{{ pendingUnstarRepo.fullName }}</strong>
+      </div>
+      <div class="unstar-cost">
+        <span class="cost-icon">💎</span>
+        <span>Bỏ star sẽ <strong>trừ 1 credit</strong> của chủ repo</span>
+      </div>
+      <div class="unstar-note">
+        Chủ repo sẽ mất đi 1 credit mà bạn đã trao cho họ khi star trước đó.
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cancelUnstar()">
+        ❌ Hủy
+      </button>
+      <button class="btn-unstar-confirm" (click)="confirmUnstar()">
+        ☆ Vẫn bỏ star
+      </button>
+    </div>
+  </div>
+</div>

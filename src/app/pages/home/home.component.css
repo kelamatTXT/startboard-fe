@@ -1197,6 +1197,67 @@
   cursor: pointer;
 }
 
+/* ═══ UNSTAR CONFIRM DIALOG ═══ */
+.unstar-modal {
+  max-width: 420px;
+}
+.unstar-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+}
+.unstar-repo-name {
+  font-size: 0.9rem;
+  color: var(--text);
+  padding: 0.5rem 0.8rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+.unstar-repo-name strong {
+  color: var(--accent);
+}
+.unstar-cost {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+.cost-icon {
+  font-size: 1.2rem;
+}
+.unstar-cost strong {
+  color: var(--danger);
+}
+.unstar-note {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+.btn-unstar-confirm {
+  padding: 0.6rem 1.5rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  color: var(--danger);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+.btn-unstar-confirm:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: var(--danger);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.2);
+}
+
 /* Credit Hint Arrow */
 .credit-hint {
   display: inline-flex;

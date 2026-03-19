@@ -33,6 +33,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   darkMode = false;
   fabOpen = false;
   showCreditInfo = false;
+  showUnstarConfirm = false;
+  pendingUnstarRepo: import('../../core/models/models').Repo | null = null;
 
   toggleTheme() {
     this.darkMode = !this.darkMode;
@@ -61,7 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private silentRefresh() {
-    this.repoService.getRepos(this.currentPage, 12).subscribe({
+    this.repoService.getRepos(this.currentPage, 6).subscribe({
       next: (data) => {
         this.repos = data.content;
         this.totalPages = data.totalPages;
@@ -78,7 +80,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   loadRepos() {
     this.loading = true;
     this.apiLoading++;
-    this.repoService.getRepos(this.currentPage, 12).subscribe({
+    this.repoService.getRepos(this.currentPage, 6).subscribe({
       next: (data) => {
         this.repos = data.content;
         this.totalPages = data.totalPages;
@@ -108,12 +110,33 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.showToast('Chủ repo đã hết credit — họ cần star repo khác trước!', 'error');
       return;
     }
+    // Nếu đang bỏ star → hiện cảnh báo trừ credit
+    if (repo.starred) {
+      this.pendingUnstarRepo = repo;
+      this.showUnstarConfirm = true;
+      return;
+    }
+
+    this.doStar(repo);
+  }
+
+  confirmUnstar() {
+    if (!this.pendingUnstarRepo) return;
+    const repo = this.pendingUnstarRepo;
+    this.showUnstarConfirm = false;
+    this.pendingUnstarRepo = null;
+    this.doUnstar(repo);
+  }
+
+  cancelUnstar() {
+    this.showUnstarConfirm = false;
+    this.pendingUnstarRepo = null;
+  }
+
+  private doStar(repo: import('../../core/models/models').Repo) {
     this.starLoading[repo.id] = true;
     this.apiLoading++;
-
-    const action$ = repo.starred
-      ? this.repoService.unstarRepo(repo.id)
-      : this.repoService.starRepo(repo.id);
+    const action$ = this.repoService.starRepo(repo.id);
 
     action$.subscribe({
       next: (updated) => {
@@ -127,16 +150,36 @@ export class HomeComponent implements OnInit, OnDestroy {
           next: (user) => { this.currentUser = user; },
           error: () => {}
         });
-        const msg = updated.starred
-          ? `⭐ Đã star ${repo.fullName}! (+1 credit)`
-          : `Đã bỏ star ${repo.fullName} (-1 credit)`;
-        this.showToast(msg, 'success');
+        this.showToast(`⭐ Đã star ${repo.fullName}! (+1 credit)`, 'success');
       },
       error: (err) => {
         console.error(err);
         this.starLoading[repo.id] = false;
         this.apiLoading--;
         this.showToast(err.error?.message || 'Lỗi khi star repo. Vui lòng thử lại.', 'error');
+      }
+    });
+  }
+
+  private doUnstar(repo: import('../../core/models/models').Repo) {
+    this.starLoading[repo.id] = true;
+    this.apiLoading++;
+    this.repoService.unstarRepo(repo.id).subscribe({
+      next: (updated) => {
+        const index = this.repos.findIndex(r => r.id === repo.id);
+        if (index !== -1) this.repos[index] = updated;
+        this.starLoading[repo.id] = false;
+        this.apiLoading--;
+        this.authService.getMe().subscribe({
+          next: (user) => { this.currentUser = user; },
+          error: () => {}
+        });
+        this.showToast(`☆ Đã bỏ star ${repo.fullName} (-1 credit)`, 'success');
+      },
+      error: (err) => {
+        this.starLoading[repo.id] = false;
+        this.apiLoading--;
+        this.showToast(err.error?.message || 'Lỗi khi bỏ star repo.', 'error');
       }
     });
   }

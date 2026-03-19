@@ -1,0 +1,279 @@
+<!-- Top Loading Bar -->
+<div class="top-bar" [class.active]="apiLoading > 0">
+  <div class="top-bar-inner"></div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-brand">
+    <div class="logo-box">⭐</div>
+    <span class="nav-title">StarBoard</span>
+    <span class="nav-tag">VN Community</span>
+  </div>
+  <div class="nav-right" *ngIf="currentUser">
+    <div
+      class="credit-chip"
+      [class.low]="currentUser.credits <= 3"
+      [title]="'Credit: ' + currentUser.credits + ' — star người khác để tăng'"
+    >
+      <span>💎</span>
+      <span class="credit-val">{{ currentUser.credits }}</span>
+      <span class="credit-lbl">credits</span>
+    </div>
+    <div class="user-pill">
+      <img
+        [src]="currentUser.avatarUrl"
+        [alt]="currentUser.login"
+        class="avatar"
+      />
+      <span class="username">{{ currentUser.name || currentUser.login }}</span>
+    </div>
+    <button
+      class="btn-theme"
+      (click)="toggleTheme()"
+      [title]="darkMode ? 'Chuyển sang sáng' : 'Chuyển sang tối'"
+    >
+      {{ darkMode ? "☀️" : "🌙" }}
+    </button>
+    <button class="btn-logout" (click)="logout()">↩ Thoát</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">🇻🇳 Cộng đồng Dev Việt Nam</div>
+    <h1>Star <span class="hero-glow">Repo Việt Nam</span></h1>
+    <p>
+      Star trực tiếp GitHub repo của cộng đồng dev Việt — không cần rời trang!
+    </p>
+    <div class="stats-row">
+      <div class="s-card">
+        <span class="s-val">{{ totalRepos }}</span>
+        <span class="s-lbl">📦 Repos</span>
+      </div>
+      <div class="s-divider"></div>
+      <div class="s-card accent">
+        <span class="s-val">{{ currentUser?.credits || 0 }}</span>
+        <span class="s-lbl">💎 Credits</span>
+      </div>
+      <div class="s-divider"></div>
+      <div class="s-card">
+        <span class="s-val">⭐</span>
+        <span class="s-lbl">Star ngay</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Action Toolbar -->
+<div class="toolbar" *ngIf="currentUser">
+  <button class="tb tb-purple" (click)="showAddModal = true">
+    <span>➕</span> Thêm Repo
+  </button>
+  <button class="tb tb-ghost" (click)="importMine()" [disabled]="!!bulkLoading">
+    <span class="spinner" *ngIf="bulkLoading === 'import'"></span>
+    <span *ngIf="bulkLoading !== 'import'">🐙</span>
+    {{ bulkLoading === "import" ? "Importing..." : "Import Repos" }}
+  </button>
+  <button class="tb tb-red" (click)="deleteMine()" [disabled]="!!bulkLoading">
+    <span class="spinner" *ngIf="bulkLoading === 'delete'"></span>
+    <span *ngIf="bulkLoading !== 'delete'">🗑️</span>
+    {{ bulkLoading === "delete" ? "Đang xoá..." : "Xoá Repos" }}
+  </button>
+  <div class="tb-sep"></div>
+  <button class="tb tb-gold" (click)="starAll()" [disabled]="!!bulkLoading">
+    <span class="spinner" *ngIf="bulkLoading === 'star'"></span>
+    <span *ngIf="bulkLoading !== 'star'">⭐</span>
+    {{ bulkLoading === "star" ? "Starring..." : "Star All" }}
+  </button>
+  <button class="tb tb-dim" (click)="unstarAll()" [disabled]="!!bulkLoading">
+    <span class="spinner" *ngIf="bulkLoading === 'unstar'"></span>
+    <span *ngIf="bulkLoading !== 'unstar'">☆</span>
+    {{ bulkLoading === "unstar" ? "Unstarring..." : "Unstar All" }}
+  </button>
+</div>
+
+<!-- Bulk Loading Overlay -->
+<div class="overlay" *ngIf="bulkLoading">
+  <div class="overlay-card">
+    <div class="overlay-ring"></div>
+    <div class="overlay-info">
+      <b>{{ getBulkLoadingText() }}</b>
+      <span>Vui lòng chờ trong giây lát...</span>
+    </div>
+  </div>
+</div>
+
+<!-- Repo Grid -->
+<main class="main-content">
+  <!-- Skeleton -->
+  <div *ngIf="loading" class="repos-grid">
+    <div *ngFor="let i of [1, 2, 3, 4, 5, 6]" class="repo-card sk-card">
+      <div class="sk sk-av"></div>
+      <div class="sk sk-t"></div>
+      <div class="sk sk-d"></div>
+      <div class="sk sk-m"></div>
+      <div class="sk sk-btn"></div>
+    </div>
+  </div>
+
+  <!-- Repo Cards -->
+  <div *ngIf="!loading" class="repos-grid">
+    <div
+      *ngFor="let repo of repos; let i = index"
+      class="repo-card"
+      [class.starred]="repo.starred"
+      [style.animation-delay]="i * 0.07 + 's'"
+    >
+      <div class="card-glow" *ngIf="repo.starred"></div>
+      <div class="own-tag" *ngIf="isOwnRepo(repo)">👤 Của bạn</div>
+
+      <div class="card-head">
+        <img
+          [src]="
+            repo.avatarUrl ||
+            'https://github.com/identicons/' + repo.owner + '.png'
+          "
+          [alt]="repo.owner"
+          class="repo-avatar"
+        />
+        <div class="meta-col">
+          <a [href]="repo.htmlUrl" target="_blank" class="repo-link">
+            <span class="owner-dim">{{ repo.owner }}</span
+            ><span class="slash">/</span>{{ repo.name }}
+          </a>
+          <div class="badges">
+            <span
+              *ngIf="repo.language"
+              class="lang-tag"
+              [style.background]="getLangColor(repo.language) + '18'"
+              [style.color]="getLangColor(repo.language)"
+              [style.border-color]="getLangColor(repo.language) + '44'"
+            >
+              <span
+                class="dot"
+                [style.background]="getLangColor(repo.language)"
+              ></span>
+              {{ repo.language }}
+            </span>
+            <span class="star-tag"
+              >★ {{ formatNumber(repo.stargazersCount) }}</span
+            >
+          </div>
+        </div>
+      </div>
+
+      <p class="repo-desc">{{ repo.description || "Chưa có mô tả..." }}</p>
+
+      <div class="card-bot">
+        <span class="community-tag" *ngIf="repo.communityStars > 0">
+          👥 {{ repo.communityStars }} cộng đồng
+        </span>
+        <button
+          class="btn-star"
+          [class.starred]="repo.starred"
+          [class.own-repo]="isOwnRepo(repo)"
+          [class.no-credit]="!repo.canStar && !repo.starred && !isOwnRepo(repo)"
+          (click)="toggleStar(repo)"
+          [disabled]="
+            !currentUser ||
+            starLoading[repo.id] ||
+            (!repo.canStar && !repo.starred) ||
+            isOwnRepo(repo)
+          "
+          [title]="
+            isOwnRepo(repo)
+              ? 'Đây là repo của bạn'
+              : !repo.canStar && !repo.starred
+                ? 'Chủ repo đã hết credit'
+                : ''
+          "
+        >
+          <span
+            class="spinner spinner-gold"
+            *ngIf="starLoading[repo.id]"
+          ></span>
+          <span class="star-icon" *ngIf="!starLoading[repo.id]">{{
+            repo.starred ? "★" : "☆"
+          }}</span>
+          <span>{{
+            starLoading[repo.id]
+              ? "Đang xử lý..."
+              : isOwnRepo(repo)
+                ? "Repo của bạn"
+                : !repo.canStar && !repo.starred
+                  ? "Hết credit"
+                  : repo.starred
+                    ? "Đã Star"
+                    : "Star"
+          }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" *ngIf="!loading && totalPages > 1">
+    <button
+      [disabled]="currentPage === 0"
+      (click)="changePage(currentPage - 1)"
+      class="page-btn"
+    >
+      ← Trước
+    </button>
+    <span class="page-info">{{ currentPage + 1 }} / {{ totalPages }}</span>
+    <button
+      [disabled]="currentPage >= totalPages - 1"
+      (click)="changePage(currentPage + 1)"
+      class="page-btn"
+    >
+      Sau →
+    </button>
+  </div>
+</main>
+
+<!-- Toast -->
+<div
+  class="toast"
+  *ngIf="toast"
+  [class.error]="toastType === 'error'"
+  [class.show]="toast"
+>
+  {{ toastType === "error" ? "❌" : "✅" }} {{ toast }}
+</div>
+
+<!-- Add Repo Modal -->
+<div class="modal-overlay" *ngIf="showAddModal" (click)="closeModal($event)">
+  <div class="modal">
+    <div class="modal-emoji">📦</div>
+    <h3>Thêm Repository</h3>
+    <p>Nhập tên repo theo định dạng <code>owner/repo</code></p>
+    <input
+      [(ngModel)]="newRepoName"
+      placeholder="vd: vuejs/vue"
+      class="modal-input"
+      (keyup.enter)="addRepo()"
+    />
+    <textarea
+      [(ngModel)]="newRepoDesc"
+      placeholder="Mô tả (tuỳ chọn)"
+      class="modal-input modal-textarea"
+      rows="3"
+    ></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="showAddModal = false">Hủy</button>
+      <button
+        class="btn-confirm"
+        (click)="addRepo()"
+        [disabled]="!newRepoName.trim() || addingRepo"
+      >
+        <span class="spinner" *ngIf="addingRepo"></span>
+        {{ addingRepo ? "Đang thêm..." : "✅ Thêm repo" }}
+      </button>
+    </div>
+  </div>
+</div>

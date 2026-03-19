@@ -14,12 +14,17 @@
     <div
       class="credit-chip"
       [class.low]="currentUser.credits <= 3"
-      [title]="'Credit: ' + currentUser.credits + ' — star người khác để tăng'"
+      [title]="'Click để xem quy định credit'"
+      (click)="showCreditInfo = true"
     >
       <span>💎</span>
       <span class="credit-val">{{ currentUser.credits }}</span>
       <span class="credit-lbl">credits</span>
     </div>
+    <span class="credit-hint" *ngIf="!showCreditInfo" (click)="showCreditInfo = true">
+      <span class="hint-arrow">👆</span>
+      <span class="hint-text">Bấm vào để xem hướng dẫn credit</span>
+    </span>
     <div class="user-pill">
       <img
         [src]="currentUser.avatarUrl"
@@ -69,31 +74,32 @@
   </div>
 </section>
 
-<!-- Action Toolbar -->
-<div class="toolbar" *ngIf="currentUser">
-  <button class="tb tb-purple" (click)="showAddModal = true">
-    <span>➕</span> Thêm Repo
+<!-- Circle Action Menu -->
+<div class="circle-menu" *ngIf="currentUser">
+  <div class="circle-ring"></div>
+  <button class="cm-btn cm-1" (click)="showAddModal = true">
+    <span class="cm-icon">➕</span>
+    <span class="cm-label">Add Repo</span>
   </button>
-  <button class="tb tb-ghost" (click)="importMine()" [disabled]="!!bulkLoading">
+  <button class="cm-btn cm-2" (click)="importMine()" [disabled]="!!bulkLoading">
     <span class="spinner" *ngIf="bulkLoading === 'import'"></span>
-    <span *ngIf="bulkLoading !== 'import'">🐙</span>
-    {{ bulkLoading === "import" ? "Importing..." : "Import Repos" }}
+    <span class="cm-icon" *ngIf="bulkLoading !== 'import'">🐙</span>
+    <span class="cm-label">Import Repo All</span>
   </button>
-  <button class="tb tb-red" (click)="deleteMine()" [disabled]="!!bulkLoading">
+  <button class="cm-btn cm-3" (click)="deleteMine()" [disabled]="!!bulkLoading">
     <span class="spinner" *ngIf="bulkLoading === 'delete'"></span>
-    <span *ngIf="bulkLoading !== 'delete'">🗑️</span>
-    {{ bulkLoading === "delete" ? "Đang xoá..." : "Xoá Repos" }}
+    <span class="cm-icon" *ngIf="bulkLoading !== 'delete'">🗑️</span>
+    <span class="cm-label">Delete Repo All</span>
   </button>
-  <div class="tb-sep"></div>
-  <button class="tb tb-gold" (click)="starAll()" [disabled]="!!bulkLoading">
+  <button class="cm-btn cm-4" (click)="starAll()" [disabled]="!!bulkLoading">
     <span class="spinner" *ngIf="bulkLoading === 'star'"></span>
-    <span *ngIf="bulkLoading !== 'star'">⭐</span>
-    {{ bulkLoading === "star" ? "Starring..." : "Star All" }}
+    <span class="cm-icon" *ngIf="bulkLoading !== 'star'">⭐</span>
+    <span class="cm-label">Star All</span>
   </button>
-  <button class="tb tb-dim" (click)="unstarAll()" [disabled]="!!bulkLoading">
+  <button class="cm-btn cm-5" (click)="unstarAll()" [disabled]="!!bulkLoading">
     <span class="spinner" *ngIf="bulkLoading === 'unstar'"></span>
-    <span *ngIf="bulkLoading !== 'unstar'">☆</span>
-    {{ bulkLoading === "unstar" ? "Unstarring..." : "Unstar All" }}
+    <span class="cm-icon" *ngIf="bulkLoading !== 'unstar'">☆</span>
+    <span class="cm-label">UnStar All</span>
   </button>
 </div>
 
@@ -273,6 +279,63 @@
       >
         <span class="spinner" *ngIf="addingRepo"></span>
         {{ addingRepo ? "Đang thêm..." : "✅ Thêm repo" }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Credit Info Popup -->
+<div class="modal-overlay" *ngIf="showCreditInfo" (click)="showCreditInfo = false">
+  <div class="modal credit-modal" (click)="$event.stopPropagation()">
+    <div class="modal-emoji">💎</div>
+    <h3>Quy Định Credit</h3>
+    <p class="credit-subtitle">Hệ thống credit giúp cân bằng việc star lẫn nhau trong cộng đồng</p>
+
+    <div class="credit-section">
+      <div class="credit-rule">
+        <span class="rule-icon gain">⬆️</span>
+        <div class="rule-content">
+          <b>Nhận Credit</b>
+          <span>Khi có người star repo của bạn, bạn nhận được <strong>+1 credit</strong></span>
+        </div>
+      </div>
+      <div class="credit-rule">
+        <span class="rule-icon spend">⬇️</span>
+        <div class="rule-content">
+          <b>Tiêu Credit</b>
+          <span>Khi bạn star repo người khác, bạn tiêu <strong>-1 credit</strong></span>
+        </div>
+      </div>
+      <div class="credit-rule">
+        <span class="rule-icon init">🎁</span>
+        <div class="rule-content">
+          <b>Credit Khởi Tạo</b>
+          <span>Mỗi tài khoản mới được tặng <strong>1 credit</strong> miễn phí</span>
+        </div>
+      </div>
+      <div class="credit-rule">
+        <span class="rule-icon warn">⚠️</span>
+        <div class="rule-content">
+          <b>Hết Credit</b>
+          <span>Khi credit = 0, người khác <strong>không thể star</strong> repo của bạn</span>
+        </div>
+      </div>
+      <div class="credit-rule">
+        <span class="rule-icon own">🚫</span>
+        <div class="rule-content">
+          <b>Không Tự Star</b>
+          <span>Bạn <strong>không thể star</strong> repo của chính mình</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="credit-tip">
+      💡 <strong>Mẹo:</strong> Import repo của bạn lên hệ thống, sau đó star repo cộng đồng để nhận star ngược lại!
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-confirm" (click)="showCreditInfo = false" style="width: 100%; justify-content: center;">
+        ✅ Đã hiểu
       </button>
     </div>
   </div>

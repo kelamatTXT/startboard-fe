@@ -31,6 +31,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   bulkLoading: 'star' | 'unstar' | 'import' | 'delete' | null = null;
   apiLoading = 0;
   darkMode = false;
+  fabOpen = false;
+  showCreditInfo = false;
 
   toggleTheme() {
     this.darkMode = !this.darkMode;

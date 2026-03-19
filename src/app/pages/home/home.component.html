@@ -351,12 +351,18 @@
       <div class="unstar-repo-name" *ngIf="pendingUnstarRepo">
         📦 <strong>{{ pendingUnstarRepo.fullName }}</strong>
       </div>
-      <div class="unstar-cost">
+
+      <!-- Cảnh báo người dùng bị trừ credit -->
+      <div class="unstar-cost unstar-cost-self">
         <span class="cost-icon">💎</span>
-        <span>Bỏ star sẽ <strong>trừ 1 credit</strong> của chủ repo</span>
+        <div>
+          <strong>Bạn sẽ bị trừ 1 credit</strong>
+          <span class="cost-sub">Credit của bạn: {{ currentUser?.credits }} → {{ (currentUser?.credits ?? 0) - 1 }}</span>
+        </div>
       </div>
+
       <div class="unstar-note">
-        Chủ repo sẽ mất đi 1 credit mà bạn đã trao cho họ khi star trước đó.
+        ⚠️ Hành động này không thể hoàn tác. Nếu muốn star lại, bạn sẽ cần tiêu thêm 1 credit nữa.
       </div>
     </div>
 

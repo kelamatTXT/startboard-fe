@@ -11,6 +11,7 @@
     -apple-system,
     sans-serif;
   min-height: 100vh;
+  overflow-x: hidden;
   transition:
     background 0.4s,
     color 0.4s;
@@ -494,34 +495,37 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* ═══ CIRCLE ACTION MENU ═══ */
-.circle-menu {
+/* ═══ ACTION BAR (thay thế circle menu) ═══ */
+.action-bar {
   position: fixed;
-  bottom: 5rem;
-  right: 5rem;
-  width: 160px;
-  height: 160px;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
   z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: var(--bg-nav);
+  backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    0 0 0 1px var(--border);
+  animation: barUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-
-/* Vòng tròn viền trang trí */
-.circle-ring {
-  position: absolute;
-  inset: 0;
-  border-radius: 50%;
-  border: 2px dashed var(--accent-border);
-  opacity: 0.5;
-  animation: ringRotate 30s linear infinite;
-}
-@keyframes ringRotate {
+@keyframes barUp {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px) scale(0.95);
+  }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
   }
 }
-
-/* Nút chung */
-.cm-btn {
-  position: absolute;
+.ab-btn {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -529,102 +533,62 @@
   background: none;
   border: none;
   cursor: pointer;
+  padding: 0.4rem 0.7rem;
+  border-radius: 14px;
   transition: all 0.25s;
-  z-index: 2;
-  padding: 0;
+  position: relative;
 }
-.cm-btn:hover:not([disabled]) {
-  transform: scale(1.15);
+.ab-btn:hover:not([disabled]) {
+  background: var(--accent-light);
+  transform: translateY(-2px);
 }
-.cm-btn:active:not([disabled]) {
+.ab-btn:active:not([disabled]) {
   transform: scale(0.95);
 }
-.cm-btn[disabled] {
+.ab-btn[disabled] {
   opacity: 0.35;
   cursor: not-allowed;
 }
-
-.cm-icon {
-  width: 44px;
-  height: 44px;
+.ab-icon {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 1.1rem;
-  transition: box-shadow 0.25s;
+  font-size: 1.05rem;
+  transition: all 0.25s;
   border: 1px solid var(--border);
   background: var(--bg-card);
-  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
-.cm-btn:hover:not([disabled]) .cm-icon {
-  box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+.ab-btn:hover:not([disabled]) .ab-icon {
+  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.25);
+  transform: scale(1.1);
 }
-
-.cm-label {
-  font-size: 0.62rem;
+.ab-icon.add {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.3);
+}
+.ab-icon.delete {
+  border-color: rgba(239, 68, 68, 0.25);
+}
+.ab-icon.star {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border: none;
+  box-shadow: 0 3px 12px rgba(245, 158, 11, 0.3);
+}
+.ab-icon.unstar {
+  border-color: var(--border);
+}
+.ab-label {
+  font-size: 0.6rem;
   font-weight: 700;
   color: var(--text-dim);
   letter-spacing: 0.3px;
   white-space: nowrap;
-}
-
-/* 5 nút trên vòng tròn — đặt theo position (top=12h, rồi theo chiều kim đồng hồ) */
-.cm-1 {
-  top: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.cm-2 {
-  top: 18px;
-  right: -22px;
-}
-.cm-3 {
-  bottom: 18px;
-  right: -22px;
-}
-.cm-4 {
-  bottom: -18px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-.cm-5 {
-  top: 50%;
-  left: -22px;
-  transform: translateY(-50%);
-}
-
-/* Hover vị trí */
-.cm-1:hover:not([disabled]) {
-  transform: translateX(-50%) scale(1.15);
-}
-.cm-4:hover:not([disabled]) {
-  transform: translateX(-50%) scale(1.15);
-}
-.cm-5:hover:not([disabled]) {
-  transform: translateY(-50%) scale(1.15);
-}
-
-/* Màu icon riêng */
-.cm-1 .cm-icon {
-  background: linear-gradient(135deg, #a855f7, #7c3aed);
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
-}
-.cm-2 .cm-icon {
-  border-color: var(--accent-border);
-}
-.cm-3 .cm-icon {
-  border-color: rgba(239, 68, 68, 0.25);
-}
-.cm-4 .cm-icon {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fff;
-  border: none;
-  box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
-}
-.cm-5 .cm-icon {
-  border-color: var(--border);
 }
 
 /* ═══ MAIN ═══ */
@@ -868,6 +832,81 @@
   transition: transform 0.25s;
 }
 
+/* ═══ STAR BURST ANIMATION (Facebook-like) ═══ */
+.btn-star.star-burst .star-icon {
+  animation: starPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+@keyframes starPop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.6) rotate(-15deg); }
+  50% { transform: scale(0.8) rotate(10deg); }
+  70% { transform: scale(1.3) rotate(-5deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+.particle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: 0.75rem;
+  opacity: 0;
+  pointer-events: none;
+  animation: none;
+}
+
+.btn-star.star-burst .particle {
+  animation-duration: 0.8s;
+  animation-timing-function: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  animation-fill-mode: forwards;
+}
+.btn-star.star-burst .p1 { animation-name: fly1; color: #facc15; }
+.btn-star.star-burst .p2 { animation-name: fly2; color: #f59e0b; }
+.btn-star.star-burst .p3 { animation-name: fly3; color: #fbbf24; }
+.btn-star.star-burst .p4 { animation-name: fly4; color: #a855f7; }
+.btn-star.star-burst .p5 { animation-name: fly5; color: #facc15; }
+.btn-star.star-burst .p6 { animation-name: fly6; color: #f59e0b; }
+.btn-star.star-burst .p7 { animation-name: fly7; font-size: 0.6rem; }
+.btn-star.star-burst .p8 { animation-name: fly8; font-size: 0.6rem; }
+
+@keyframes fly1 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(-30px, -40px) scale(1.2) rotate(45deg); }
+}
+@keyframes fly2 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(28px, -38px) scale(1) rotate(-30deg); }
+}
+@keyframes fly3 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(-40px, -15px) scale(0.9) rotate(60deg); }
+}
+@keyframes fly4 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(42px, -12px) scale(1.1) rotate(-45deg); }
+}
+@keyframes fly5 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(-20px, -50px) scale(0.8) rotate(90deg); }
+}
+@keyframes fly6 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(18px, -48px) scale(0.7) rotate(-60deg); }
+}
+@keyframes fly7 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(5px, -55px) scale(1.3) rotate(30deg); }
+}
+@keyframes fly8 {
+  0% { opacity: 1; transform: translate(0, 0) scale(0.5); }
+  100% { opacity: 0; transform: translate(-35px, -30px) scale(1) rotate(-40deg); }
+}
+
 /* ═══ SKELETON ═══ */
 .sk-card {
   border-color: var(--border-light) !important;
@@ -993,14 +1032,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1.5rem;
+  overflow: hidden;
   animation: fadeIn 0.2s;
 }
 .modal {
-  width: 480px;
+  width: 100%;
+  max-width: 480px;
   padding: 2.2rem;
   background: var(--bg-card);
   border: 1px solid var(--accent-border);
   border-radius: 24px;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+  word-break: break-word;
   box-shadow:
     0 0 80px rgba(124, 58, 237, 0.08),
     0 32px 80px rgba(0, 0, 0, 0.25);
@@ -1200,6 +1245,8 @@
 /* ═══ UNSTAR CONFIRM DIALOG ═══ */
 .unstar-modal {
   max-width: 420px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .unstar-warning {
   display: flex;
@@ -1308,25 +1355,11 @@
 /* Tablet */
 @media (max-width: 1024px) {
   .main-content {
-    padding: 2rem 1.5rem 4rem;
+    padding: 2rem 1.5rem 5rem;
   }
   .repos-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.2rem;
-  }
-  .circle-menu {
-    bottom: 3rem;
-    right: 3rem;
-    width: 140px;
-    height: 140px;
-  }
-  .cm-icon {
-    width: 38px;
-    height: 38px;
-    font-size: 0.95rem;
-  }
-  .cm-label {
-    font-size: 0.55rem;
   }
 }
 
@@ -1422,42 +1455,27 @@
     align-self: center;
   }
 
-  /* Circle Menu */
-  .circle-menu {
-    bottom: 1.5rem;
-    right: 1rem;
-    width: 120px;
-    height: 120px;
+  /* Action Bar */
+  .action-bar {
+    bottom: 0.8rem;
+    padding: 0.5rem 0.6rem;
+    gap: 0.3rem;
   }
-  .cm-icon {
+  .ab-btn {
+    padding: 0.3rem 0.5rem;
+  }
+  .ab-icon {
     width: 34px;
     height: 34px;
     font-size: 0.85rem;
   }
-  .cm-label {
+  .ab-label {
     font-size: 0.5rem;
-  }
-  .cm-1 {
-    top: -14px;
-  }
-  .cm-2 {
-    top: 12px;
-    right: -18px;
-  }
-  .cm-3 {
-    bottom: 12px;
-    right: -18px;
-  }
-  .cm-4 {
-    bottom: -14px;
-  }
-  .cm-5 {
-    left: -18px;
   }
 
   /* Cards */
   .main-content {
-    padding: 1.5rem 1rem 4rem;
+    padding: 1.5rem 1rem 6rem;
   }
   .repos-grid {
     grid-template-columns: 1fr;
@@ -1495,7 +1513,7 @@
   .toast {
     left: 1rem;
     right: 1rem;
-    bottom: 1rem;
+    bottom: 5.5rem;
     font-size: 0.8rem;
     padding: 0.7rem 1rem;
     border-radius: 12px;
@@ -1503,10 +1521,15 @@
 
   /* Modal */
   .modal {
-    width: calc(100vw - 2rem);
-    padding: 1.5rem;
+    padding: 1.2rem;
     border-radius: 20px;
-    margin: 0 1rem;
+  }
+  .unstar-warning {
+    padding: 0.7rem;
+    gap: 0.6rem;
+  }
+  .unstar-note {
+    font-size: 0.72rem;
   }
   .modal h3 {
     font-size: 1.1rem;
@@ -1541,18 +1564,19 @@
   .hero p {
     font-size: 0.8rem;
   }
-  .circle-menu {
-    width: 100px;
-    height: 100px;
-    bottom: 1rem;
-    right: 0.5rem;
+  .action-bar {
+    gap: 0.15rem;
+    padding: 0.4rem 0.5rem;
   }
-  .cm-icon {
-    width: 28px;
-    height: 28px;
+  .ab-btn {
+    padding: 0.25rem 0.35rem;
+  }
+  .ab-icon {
+    width: 30px;
+    height: 30px;
     font-size: 0.75rem;
   }
-  .cm-label {
+  .ab-label {
     font-size: 0.42rem;
   }
   .user-pill {

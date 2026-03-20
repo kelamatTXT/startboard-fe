@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   loading = true;
   starLoading: { [key: number]: boolean } = {};
+  starBurst: { [key: number]: boolean } = {};
   currentPage = 0;
   totalPages = 0;
   totalRepos = 0;
@@ -150,6 +151,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           next: (user) => { this.currentUser = user; },
           error: () => {}
         });
+        this.triggerStarBurst(repo.id);
         this.showToast(`⭐ Đã star ${repo.fullName}! (+1 credit)`, 'success');
       },
       error: (err) => {
@@ -341,5 +343,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.toast = msg;
     this.toastType = type;
     setTimeout(() => { this.toast = null; }, 3500);
+  }
+
+  private triggerStarBurst(repoId: number) {
+    this.starBurst[repoId] = true;
+    setTimeout(() => {
+      this.starBurst[repoId] = false;
+    }, 900);
   }
 }
